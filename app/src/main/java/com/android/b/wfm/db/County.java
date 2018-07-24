@@ -10,7 +10,6 @@ public class County {
     private String countyName;
     private String weatherId;
     private int cityId;
-    private String cityName;
 
 
 
@@ -30,10 +29,6 @@ public class County {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getCityId() {
-        return cityId;
     }
 
     public String getWeatherId() {
