@@ -243,8 +243,8 @@ public class WeatherActivity extends AppCompatActivity {
 
             dateText.setText(item.date);
             infoText.setText(item.condDay);
-            maxTemp.setText(item.temperatureMax);
-            minTemp.setText(item.temperatureMin);
+            maxTemp.setText(item.temperatureMax + "°C");
+            minTemp.setText(item.temperatureMin + "°C");
 
             forecastLayout.addView(view);
         }
