@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -86,11 +87,11 @@ public class WeatherActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >= 21) {
-            View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
-        }
+//        if (Build.VERSION.SDK_INT >= 21) {
+//            View decorView = getWindow().getDecorView();
+//            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+//            getWindow().setStatusBarColor(Color.TRANSPARENT);
+//        }
 
         setContentView(R.layout.activity_weather);
 
@@ -122,12 +123,14 @@ public class WeatherActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherNowString = sharedPreferences.getString(WEATHER_NOW, null);
 
-        String bingPic = sharedPreferences.getString("bing_pic", null);
-        if (bingPic != null) {
-            Glide.with(this).load(bingPic).into(bingPicImg);
-        } else {
-            loadBingPic();
-        }
+//        String bingPic = sharedPreferences.getString("bing_pic", null);
+//        if (bingPic != null) {
+//            Glide.with(this).load(bingPic).into(bingPicImg);
+//        } else {
+//            loadBingPic();
+//        }
+
+        loadBingPic();
 
         if (weatherNowString != null) {
             WeatherNow weatherNow = Utility.handleWeatherNowResponse(weatherNowString);
@@ -322,31 +325,24 @@ public class WeatherActivity extends AppCompatActivity {
         weatherInfoText.setText(weatherInfo);
 
         weatherLayout.setVisibility(View.VISIBLE);
-        loadBingPic();
+
     }
 
     private void loadBingPic() {
-        HttpUtil.sendOkHttpRequest(PIC_URL, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
+        String base = "http://7xr4g8.com1.z0.glb.clouddn.com/";
+        Random random = new Random();
+        int num = random.nextInt(965);
+        final String url = base + String.valueOf(num);
 
+        runOnUiThread(new Runnable() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String bingPic = response.body().string();
-                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
-                editor.putString("bing_pic", bingPic);
-                editor.apply();
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Glide.with(WeatherActivity.this).load(bingPic).into(bingPicImg);
-                    }
-                });
+            public void run() {
+                Glide.with(WeatherActivity.this).load(url).into(bingPicImg);
+//                Toast.makeText(WeatherActivity.this, "picture loaded", Toast.LENGTH_LONG).show();
             }
         });
     }
+
+
 
 }
