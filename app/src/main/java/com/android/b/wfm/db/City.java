@@ -11,9 +11,6 @@ public class City{
     private int provinceId;
     private int cityCode;
 
-    private List<County> allCounties;
-    private final String SPLITOR = "@@";
-
 
     public void setCityCode(int cityCode) {
         this.cityCode = cityCode;
