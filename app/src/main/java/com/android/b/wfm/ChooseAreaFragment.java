@@ -1,6 +1,7 @@
 package com.android.b.wfm;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -520,6 +521,12 @@ public class ChooseAreaFragment extends Fragment {
                     selectedCity = cityList.get(position);
                     queryCounties();
 
+                } else if (currentLevel == LEVEL_COUNTY) {
+                    String countyName = countyList.get(position).getCountyName();
+                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                    intent.putExtra("countyName", countyName);
+                    startActivity(intent);
+                    getActivity().finish();
                 }
             }
         });
@@ -611,7 +618,7 @@ public class ChooseAreaFragment extends Fragment {
         listView.setSelection(0);
         currentLevel = LEVEL_COUNTY;
 
-        Log.i("name", selectedCity.getCityName());
+//        Log.i("name", selectedCity.getCityName());
 
     }
 

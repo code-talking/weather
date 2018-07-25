@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">WFM</string>
+    <string name="forecast">未来天气</string>
+    <string name="detail">天气详情</string>
+    <string name="feeling_temp">体感温度</string>
+    <string name="humidity">湿度</string>
+    <string name="suggestion">生活建议</string>
 </resources>
