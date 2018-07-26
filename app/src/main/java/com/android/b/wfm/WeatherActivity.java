@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,6 +50,8 @@ public class WeatherActivity extends AppCompatActivity {
 
     private static final String HEWEATHER_KEY = "&key=f71cf2991a6f4acda8b96f0cb41d407c";
 
+    private static final int DEFAULT_DAILY_FORECAST_NUMBER = 3;
+
     private static final String OK = "ok";
 
     private ScrollView weatherLayout;
@@ -81,19 +84,18 @@ public class WeatherActivity extends AppCompatActivity {
 
     private ImageView bingPicImg;
 
-    private String PIC_URL = "http://guolin.tech/api/bing_pic";
+    public SwipeRefreshLayout swipeRefresh;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        if (Build.VERSION.SDK_INT >= 21) {
-//            View decorView = getWindow().getDecorView();
-//            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-//            getWindow().setStatusBarColor(Color.TRANSPARENT);
-//        }
 
         setContentView(R.layout.activity_weather);
+
+        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipte_refresh);
+        swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+
 
         weatherLayout = (ScrollView) findViewById(R.id.weather_layout);
         titleCity = (TextView) findViewById(R.id.title_city);
@@ -120,27 +122,34 @@ public class WeatherActivity extends AppCompatActivity {
 
         bingPicImg = (ImageView) findViewById(R.id.bing_pic_img);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String weatherNowString = sharedPreferences.getString(WEATHER_NOW, null);
+//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        String weatherNowString = sharedPreferences.getString(WEATHER_NOW, null);
+//
 
-//        String bingPic = sharedPreferences.getString("bing_pic", null);
-//        if (bingPic != null) {
-//            Glide.with(this).load(bingPic).into(bingPicImg);
+//
+//        if (weatherNowString != null) {
+//            WeatherNow weatherNow = Utility.handleWeatherNowResponse(weatherNowString);
+//
+//            showWeatherNowInfo(weatherNow);
 //        } else {
-//            loadBingPic();
+//            String countyName = getIntent().getStringExtra(COUNTY_NAME);
+//            weatherLayout.setVisibility(View.INVISIBLE);
+//            requestWeather(countyName);
 //        }
 
         loadBingPic();
 
-        if (weatherNowString != null) {
-            WeatherNow weatherNow = Utility.handleWeatherNowResponse(weatherNowString);
+        final String countyName = getIntent().getStringExtra(COUNTY_NAME);
+        weatherLayout.setVisibility(View.INVISIBLE);
+        requestWeather(countyName);
 
-            showWeatherNowInfo(weatherNow);
-        } else {
-            String countyName = getIntent().getStringExtra(COUNTY_NAME);
-            weatherLayout.setVisibility(View.INVISIBLE);
-            requestWeather(countyName);
-        }
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                requestWeather(countyName);
+                Toast.makeText(WeatherActivity.this, "更新成功", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void requestWeather(String countyName) {
@@ -165,6 +174,7 @@ public class WeatherActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(WeatherActivity.this, "天气加载失败...", Toast.LENGTH_SHORT).show();
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -182,8 +192,10 @@ public class WeatherActivity extends AppCompatActivity {
                         if (weatherNow != null && OK.equals(weatherNow.status)) {
 //                            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
 //                            editor.apply();
-                            showWeatherNowInfo(weatherNow);
+//                            showWeatherNowInfo(weatherNow);
                         }
+                        showWeatherNowInfo(weatherNow);
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -202,6 +214,7 @@ public class WeatherActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(WeatherActivity.this, "未来天气加载失败...", Toast.LENGTH_SHORT).show();
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -217,6 +230,7 @@ public class WeatherActivity extends AppCompatActivity {
                         if (weatherFuture != null && OK.equals(weatherFuture.status)) {
                             showWeatherFutureInfo(weatherFuture);
                         }
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -236,6 +250,7 @@ public class WeatherActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(WeatherActivity.this, "生活建议加载失败", Toast.LENGTH_SHORT).show();
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -249,8 +264,10 @@ public class WeatherActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         if (weatherSuggetion != null && OK.equals(weatherSuggetion.status)) {
-                            showWeatherSuggestionInfo(weatherSuggetion);
+//                            showWeatherSuggestionInfo(weatherSuggetion);
                         }
+                        showWeatherSuggestionInfo(weatherSuggetion);
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -258,19 +275,20 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     private void showWeatherFutureInfo(WeatherFuture weatherFuture) {
-//        Log.i("loc", loc);
         List<DailyForecast> lst = weatherFuture.futures;
-        for (DailyForecast item : lst) {
+        forecastLayout.removeAllViews();
+
+        for (int i = lst.size() - DEFAULT_DAILY_FORECAST_NUMBER; i < lst.size(); i++) {
             View view = LayoutInflater.from(this).inflate(R.layout.forecast_item, forecastLayout, false);
             TextView dateText = (TextView) view.findViewById(R.id.date_text);
             TextView infoText = (TextView) view.findViewById(R.id.info_text);
             TextView maxTemp = (TextView) view.findViewById(R.id.max_text);
             TextView minTemp = (TextView) view.findViewById(R.id.min_text);
 
-            dateText.setText(item.date);
-            infoText.setText(item.condDay);
-            maxTemp.setText(item.temperatureMax + "°C");
-            minTemp.setText(item.temperatureMin + "°C");
+            dateText.setText(lst.get(i).date);
+            infoText.setText(lst.get(i).condDay);
+            maxTemp.setText(lst.get(i).temperatureMax + "°C");
+            minTemp.setText(lst.get(i).temperatureMin + "°C");
 
             forecastLayout.addView(view);
         }

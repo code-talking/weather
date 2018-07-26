@@ -647,51 +647,51 @@ public class ChooseAreaFragment extends Fragment {
         return rst;
     }
 
-    private void queryFromServer(String url, final String type) {
-        showProgressDialog();
-        HttpUtil.sendOkHttpRequest(url, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        closeProgressDialog();
-                        Toast.makeText(getContext(), "加载失败", Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responseText = response.body().string();
-                boolean rst = false;
-
-                if ("province".equals(type)) {
-                    rst = Utility.handleProvinceResponse(responseText);
-                } else if ("city".equals(type)) {
-                    rst = Utility.handleCityResponse(responseText, selectedProvince.getId());
-                } else if ("county".equals(type)) {
-                    rst = Utility.handleCountyResponse(responseText, selectedCity.getId());
-                }
-
-                if (rst) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            closeProgressDialog();
-                            if ("province".equals(type)) {
-                                queryProvinces();
-                            } else if ("city".equals(type)) {
-                                queryCities();
-                            } else if ("county".equals(type)) {
-                                queryCounties();
-                            }
-                        }
-                    });
-                }
-            }
-        });
-    }
+//    private void queryFromServer(String url, final String type) {
+//        showProgressDialog();
+//        HttpUtil.sendOkHttpRequest(url, new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//                getActivity().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        closeProgressDialog();
+//                        Toast.makeText(getContext(), "加载失败", Toast.LENGTH_LONG).show();
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException {
+//                String responseText = response.body().string();
+//                boolean rst = false;
+//
+//                if ("province".equals(type)) {
+//                    rst = Utility.handleProvinceResponse(responseText);
+//                } else if ("city".equals(type)) {
+//                    rst = Utility.handleCityResponse(responseText, selectedProvince.getId());
+//                } else if ("county".equals(type)) {
+//                    rst = Utility.handleCountyResponse(responseText, selectedCity.getId());
+//                }
+//
+//                if (rst) {
+//                    getActivity().runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            closeProgressDialog();
+//                            if ("province".equals(type)) {
+//                                queryProvinces();
+//                            } else if ("city".equals(type)) {
+//                                queryCities();
+//                            } else if ("county".equals(type)) {
+//                                queryCounties();
+//                            }
+//                        }
+//                    });
+//                }
+//            }
+//        });
+//    }
 
     private void showProgressDialog() {
         if (progressDialog == null) {
