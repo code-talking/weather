@@ -41,7 +41,7 @@ import okhttp3.Response;
 
 public class WeatherActivity extends AppCompatActivity {
 
-    private static final String WEATHER_NOW = "weather";
+    private static final String WEATHER_NOW = "weatherNow";
 
     private static final String COUNTY_NAME = "countyName";
 
