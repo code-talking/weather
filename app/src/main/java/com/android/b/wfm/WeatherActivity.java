@@ -51,6 +51,8 @@ public class WeatherActivity extends AppCompatActivity {
     private static final String HEWEATHER_KEY = "&key=f71cf2991a6f4acda8b96f0cb41d407c";
 
     private static final int DEFAULT_DAILY_FORECAST_NUMBER = 3;
+    private static final int REFRESH = 1;
+    private static final int LOAD = 0;
 
     private static final String OK = "ok";
 
@@ -85,6 +87,8 @@ public class WeatherActivity extends AppCompatActivity {
     private ImageView bingPicImg;
 
     public SwipeRefreshLayout swipeRefresh;
+
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -141,21 +145,29 @@ public class WeatherActivity extends AppCompatActivity {
 
         final String countyName = getIntent().getStringExtra(COUNTY_NAME);
         weatherLayout.setVisibility(View.INVISIBLE);
-        requestWeather(countyName);
+        requestWeather(countyName, LOAD);
 
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                requestWeather(countyName);
-                Toast.makeText(WeatherActivity.this, "更新成功", Toast.LENGTH_SHORT).show();
+                requestWeather(countyName, REFRESH);
+
             }
         });
     }
 
-    public void requestWeather(String countyName) {
+    public void requestWeather(String countyName, int source) {
         requestWeatherNow(countyName);
         requestWeatherFuture(countyName);
         requestweatherSuggestions(countyName);
+        if (source == REFRESH) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(WeatherActivity.this, "更新成功", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     /**
