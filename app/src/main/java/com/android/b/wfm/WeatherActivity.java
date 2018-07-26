@@ -6,11 +6,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -52,7 +55,7 @@ public class WeatherActivity extends AppCompatActivity {
 
     private static final int DEFAULT_DAILY_FORECAST_NUMBER = 3;
     private static final int REFRESH = 1;
-    private static final int LOAD = 0;
+    protected static final int LOAD = 0;
 
     private static final String OK = "ok";
 
@@ -88,6 +91,9 @@ public class WeatherActivity extends AppCompatActivity {
 
     public SwipeRefreshLayout swipeRefresh;
 
+    public DrawerLayout drawerLayout;
+
+    private Button navButton;
 
 
     @Override
@@ -96,6 +102,9 @@ public class WeatherActivity extends AppCompatActivity {
 
 
         setContentView(R.layout.activity_weather);
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        navButton = (Button) findViewById(R.id.nav_button);
 
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipte_refresh);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
@@ -152,6 +161,13 @@ public class WeatherActivity extends AppCompatActivity {
             public void onRefresh() {
                 requestWeather(countyName, REFRESH);
 
+            }
+        });
+
+        navButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawerLayout.openDrawer(GravityCompat.START);
             }
         });
     }
